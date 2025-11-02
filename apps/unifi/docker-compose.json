@@ -1,0 +1,157 @@
+{
+  "services": [
+    {
+      "name": "${COMPOSE_PROJECT_NAME}_mongo",
+      "image": "mongo:3.6",
+      "volumes": [
+        {
+          "hostPath": "db",
+          "containerPath": "/data/db",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "dbcfg",
+          "containerPath": "/data/configdb",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        }
+      ]
+    },
+    {
+      "name": "${COMPOSE_PROJECT_NAME}_controller",
+      "image": "jacobalberty/unifi:${TAG:-latest}",
+      "environment": {
+        "DB_URI": "mongodb://mongo/unifi",
+        "STATDB_URI": "mongodb://mongo/unifi_stat",
+        "DB_NAME": "unifi"
+      },
+      "internalPort": 3478,
+      "addPorts": [
+        {
+          "containerPort": 5514,
+          "hostPort": 5514,
+          "tcp": false,
+          "udp": true
+        },
+        {
+          "containerPort": 6789,
+          "hostPort": 6789,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 8443,
+          "hostPort": 8443,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 8843,
+          "hostPort": 8843,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 8880,
+          "hostPort": 8880,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 10001,
+          "hostPort": 10001,
+          "tcp": false,
+          "udp": true
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "dir",
+          "containerPath": "/unifi",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "data",
+          "containerPath": "/unifi/data",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "log",
+          "containerPath": "/unifi/log",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "cert",
+          "containerPath": "/unifi/cert",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "init",
+          "containerPath": "/unifi/init.d",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "run",
+          "containerPath": "/var/run/unifi",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "./backup",
+          "containerPath": "/unifi/data/backup",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        }
+      ],
+      "sysctls": {
+        "net.ipv4.ip_unprivileged_port_start": 0
+      },
+      "user": "unifi",
+      "dependsOn": {
+        "mongo": {
+          "condition": "service_started"
+        }
+      }
+    },
+    {
+      "name": "${COMPOSE_PROJECT_NAME}_logs",
+      "image": "bash",
+      "command": "bash -c 'tail -F /unifi/log/*.log'",
+      "volumes": [
+        {
+          "hostPath": "log",
+          "containerPath": "/unifi/log",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        }
+      ],
+      "dependsOn": {
+        "controller": {
+          "condition": "service_started"
+        }
+      }
+    }
+  ]
+}
