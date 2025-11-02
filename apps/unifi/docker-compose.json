@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 2,	
+  "schemaVersion": 2,
   "services": [
     {
-      "name": "unifi_mongo",
+      "name": "0",
       "image": "mongo:3.6",
       "volumes": [
         {
@@ -22,56 +22,20 @@
       ]
     },
     {
-      "name": "unifi_controller",
+      "name": "1",
       "image": "jacobalberty/unifi:${TAG:-latest}",
       "environment": [
-        "DB_URI": "mongodb://mongo/unifi",
-        "STATDB_URI": "mongodb://mongo/unifi_stat",
-        "DB_NAME": "unifi"
-      ],
-      "internalPort": 3478,
-      "addPorts": [
         {
-          "containerPort": 5514,
-          "hostPort": 5514,
-          "tcp": false,
-          "udp": true
+          "key": "DB_URI",
+          "value": "mongodb://mongo/unifi"
         },
         {
-          "containerPort": 6789,
-          "hostPort": 6789,
-          "tcp": true,
-          "udp": false
+          "key": "STATDB_URI",
+          "value": "mongodb://mongo/unifi_stat"
         },
         {
-          "containerPort": 8080,
-          "hostPort": 8080,
-          "tcp": true,
-          "udp": false
-        },
-        {
-          "containerPort": 8443,
-          "hostPort": 8443,
-          "tcp": true,
-          "udp": false
-        },
-        {
-          "containerPort": 8843,
-          "hostPort": 8843,
-          "tcp": true,
-          "udp": false
-        },
-        {
-          "containerPort": 8880,
-          "hostPort": 8880,
-          "tcp": true,
-          "udp": false
-        },
-        {
-          "containerPort": 10001,
-          "hostPort": 10001,
-          "tcp": false,
-          "udp": true
+          "key": "DB_NAME",
+          "value": "unifi"
         }
       ],
       "volumes": [
@@ -128,15 +92,10 @@
       "sysctls": {
         "net.ipv4.ip_unprivileged_port_start": 0
       },
-      "user": "unifi",
-      "dependsOn": {
-        "mongo": {
-          "condition": "service_started"
-        }
-      }
+      "user": "unifi"
     },
     {
-      "name": "unifi_logs",
+      "name": "2",
       "image": "bash",
       "command": "bash -c 'tail -F /unifi/log/*.log'",
       "volumes": [
@@ -147,12 +106,7 @@
           "shared": false,
           "private": false
         }
-      ],
-      "dependsOn": {
-        "controller": {
-          "condition": "service_started"
-        }
-      }
+      ]
     }
   ]
 }
