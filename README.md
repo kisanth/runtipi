@@ -18,6 +18,7 @@ This is my appstore repository for runtipi
   - `apps.test.ts`: Test suite for validating apps
 
 ## Apps
+  - Thses apps are currenty maintained here
 	- `Dawarich`: A location tracker, good alternative for Google maps timeline
 	- `Unifi`: Manage your unifi devices
 
